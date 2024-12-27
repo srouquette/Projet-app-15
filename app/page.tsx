@@ -1,13 +1,19 @@
 // import Link from "next/link";
-import dbConnect from "../lib/db";
-import Game, { Games } from "../models/Game";
-import { GetServerSideProps } from "next";
+import dbConnect from "@/app/lib/db";
+import Game from "@/app/models/Game";
 
-type Props = {
-  games: Games[];
-};
 
-const Index = ({ games }: Props) => {
+export default async function Page() {
+  await dbConnect();
+
+  /* find all the data in our database */
+  const result = await Game.find({});
+
+  /* Ensures all objectIds and nested objectIds are serialized as JSON data */
+  const games = result.map((doc) => {
+    const game = JSON.parse(JSON.stringify(doc));
+    return game;
+  });
   return (
     <>
       {games.map((game) => (
@@ -45,21 +51,3 @@ const Index = ({ games }: Props) => {
     </>
   );
 };
-
-/* Retrieves game(s) data from mongodb database */
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  await dbConnect();
-
-  /* find all the data in our database */
-  const result = await Game.find({});
-
-  /* Ensures all objectIds and nested objectIds are serialized as JSON data */
-  const games = result.map((doc) => {
-    const game = JSON.parse(JSON.stringify(doc));
-    return game;
-  });
-
-  return { props: { games: games } };
-};
-
-export default Index;

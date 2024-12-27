@@ -1,5 +1,7 @@
+"use client"
+
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { mutate } from "swr";
 
 interface FormData {
@@ -33,33 +35,33 @@ const Form = ({ formId, gameForm, forNewGame = true }: Props) => {
     dislikes: gameForm.dislikes,
   });
 
-  /* The PUT method edits an existing entry in the mongodb database. */
-  const putData = async (form: FormData) => {
-    const { id } = router.query;
+  // /* The PUT method edits an existing entry in the mongodb database. */
+  // const putData = async (form: FormData) => {
+  //   const { id } = router..id;
 
-    try {
-      const res = await fetch(`/api/games/${id}`, {
-        method: "PUT",
-        headers: {
-          Accept: contentType,
-          "Content-Type": contentType,
-        },
-        body: JSON.stringify(form),
-      });
+  //   try {
+  //     const res = await fetch(`/api/games/${id}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         Accept: contentType,
+  //         "Content-Type": contentType,
+  //       },
+  //       body: JSON.stringify(form),
+  //     });
 
-      // Throw error with status code in case Fetch API req failed
-      if (!res.ok) {
-        throw new Error(res.status.toString());
-      }
+  //     // Throw error with status code in case Fetch API req failed
+  //     if (!res.ok) {
+  //       throw new Error(res.status.toString());
+  //     }
 
-      const { data } = await res.json();
+  //     const { data } = await res.json();
 
-      mutate(`/api/games/${id}`, data, false); // Update the local data without a revalidation
-      router.push("/");
-    } catch (error) {
-      setMessage("Failed to update game");
-    }
-  };
+  //     mutate(`/api/games/${id}`, data, false); // Update the local data without a revalidation
+  //     router.push("/");
+  //   } catch {
+  //     setMessage("Failed to update game");
+  //   }
+  // };
 
   /* The POST method adds a new entry in the mongodb database. */
   const postData = async (form: FormData) => {
@@ -79,7 +81,7 @@ const Form = ({ formId, gameForm, forNewGame = true }: Props) => {
       }
 
       router.push("/");
-    } catch (error) {
+    } catch {
       setMessage("Failed to add game");
     }
   };
@@ -113,7 +115,11 @@ const Form = ({ formId, gameForm, forNewGame = true }: Props) => {
     const errs = formValidate();
 
     if (Object.keys(errs).length === 0) {
-      forNewGame ? postData(form) : putData(form);
+      if (forNewGame) {
+        postData(form);
+      // } else {
+      //   putData(form);
+      }
     } else {
       setErrors({ errs });
     }
